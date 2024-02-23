@@ -37,7 +37,7 @@ app.get("/", async (req, res) => {
 
 app.post("/add", async (req, res) => {
   const item = req.body.newItem;
-  // items.push({ title: item });
+
   try {
     await db.query("INSERT INTO items (title) VALUES ($1)", [item]);
   } catch (error) {
@@ -46,9 +46,29 @@ app.post("/add", async (req, res) => {
   res.redirect("/");
 });
 
-app.post("/edit", (req, res) => {});
+app.post("/edit", async (req, res) => {
+  const id = req.body.updatedItemId;
+  const updateTitle = req.body.updatedItemTitle;
+  try {
+    await db.query("UPDATE items SET title = $1 WHERE id = $2", [
+      updateTitle,
+      id,
+    ]);
+    res.redirect("/");
+  } catch (error) {
+    console.log("Update Error");
+  }
+});
 
-app.post("/delete", (req, res) => {});
+app.post("/delete", async (req, res) => {
+  const id = req.body.deleteItemId;
+  try {
+    await db.query("DELETE FROM items WHERE id = $1", [id]);
+    res.redirect("/");
+  } catch (error) {
+    console.log("Delete item error");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
